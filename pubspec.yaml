@@ -2,7 +2,7 @@ name: either
 description: Either is a generic class in Dart that represents a value of one of two possible types L or R. The class is useful when you want to return a value that can either be of type L or of type R, but not both.
 
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/hasanmhallak/Either
 
 environment:
   sdk: ">=2.19.2 <3.0.0"
