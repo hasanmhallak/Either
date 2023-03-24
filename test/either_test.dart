@@ -1,4 +1,4 @@
-import 'package:either/either.dart';
+import 'package:eitherx/eitherx.dart';
 import 'package:test/test.dart';
 
 void main() {

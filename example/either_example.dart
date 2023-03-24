@@ -1,4 +1,4 @@
-import 'package:either/either.dart';
+import 'package:eitherx/eitherx.dart';
 
 void main() {
   final myEither = right<String, int>(45);
