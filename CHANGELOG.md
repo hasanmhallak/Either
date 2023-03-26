@@ -1,3 +1,8 @@
+## 1.0.3
+
+- Add `Unit` class
+- Update ReadMe
+
 ## 1.0.2
 
 - fix compatibility flutter_test

@@ -1,7 +1,7 @@
 name: eitherx
 description: Either provides a way to handle errors and exceptions in a more expressive and concise way
 
-version: 1.0.2
+version: 1.0.3
 repository: https://github.com/hasanmhallak/Either
 
 environment:
