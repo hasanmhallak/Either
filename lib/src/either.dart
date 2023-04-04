@@ -6,7 +6,31 @@ abstract class Either<L, R> {
 
   /// A getter that returns a boolean indicating whether
   /// the instance of [Either] is a [Left] instance.
+  ///
+  /// It's recommend to use `is` operator to check
+  /// for types. e.g:
+  /// ```dart
+  ///   final data = left<String, int>('data');
+  ///
+  ///   final isLeft = data is Left;
+  ///
+  ///   print(isLeft); // true
+  /// ```
   bool get isLeft;
+
+  /// A getter that returns a boolean indicating whether
+  /// the instance of [Either] is a [Right] instance.
+  ///
+  /// It's recommend to use `is` operator to check
+  /// for types. e.g:
+  /// ```dart
+  ///   final data = right<String, int>(45);
+  ///
+  ///   final isRight = data is Right;
+  ///
+  ///   print(isRight); // true
+  /// ```
+  bool get isRight;
 
   /// A generic method that takes two functions, [leftFn] and
   /// [rightFn], as parameters.
@@ -120,6 +144,9 @@ class Left<L, R> extends Either<L, R> {
 
   @override
   int get hashCode => left.hashCode;
+
+  @override
+  bool get isRight => false;
 }
 
 /// Creates a new instance of [Left] with a value
@@ -187,6 +214,9 @@ class Right<L, R> extends Either<L, R> {
 
   @override
   int get hashCode => right.hashCode;
+
+  @override
+  bool get isRight => true;
 }
 
 /// Creates a new instance of [Right] with a value
