@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Add `isRight` method
+
 ## 1.0.3
 
 - Add `Unit` class

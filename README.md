@@ -12,7 +12,7 @@ To use Either in your Flutter or Dart project, follow these steps:
 
 ```yaml
 dependencies:
-  either: ^1.0.3
+  either: ^1.0.4
 ```
 
 2. Install the package by running flutter pub get in your terminal.
