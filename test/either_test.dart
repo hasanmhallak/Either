@@ -3,14 +3,14 @@ import 'package:test/test.dart';
 
 void main() {
   group('Either', () {
-    test('isLeft should return true for a Left instance', () {
+    test('left function should return a Left instance', () {
       final either = left<int, String>(42);
-      expect(either.isLeft, isTrue);
+      expect(either, isA<Left>());
     });
 
-    test('isLeft should return false for a Right instance', () {
+    test('right function should return a Right instance', () {
       final either = right<int, String>('hello');
-      expect(either.isLeft, isFalse);
+      expect(either, isA<Right>());
     });
 
     test('fold should call leftFn if the instance is Left', () {
@@ -69,7 +69,7 @@ void main() {
       test('should create a Left instance with a value of type int', () {
         final either = left<int, String>(42);
 
-        expect(either.isLeft, isTrue);
+        expect(either, isA<Left>());
         expect(either.leftOrNull(), equals(42));
         expect(either.rightOrNull(), isNull);
 
@@ -93,7 +93,7 @@ void main() {
       test('should create a Right instance with a value of type String', () {
         final either = right<int, String>('42');
 
-        expect(either.isLeft, isFalse);
+        expect(either, isA<Right>());
         expect(either.leftOrNull(), isNull);
         expect(either.rightOrNull(), equals('42'));
 
@@ -104,7 +104,7 @@ void main() {
       test('should create a Left instance with a value of type String', () {
         final either = left<String, int>('value');
 
-        expect(either.isLeft, isTrue);
+        expect(either, isA<Left>());
         expect(either.rightOrNull(), isNull);
         expect(either.leftOrNull(), equals('value'));
 
