@@ -147,6 +147,9 @@ class Left<L, R> extends Either<L, R> {
 
   @override
   bool get isRight => false;
+
+  @override
+  String toString() => 'Left($left)';
 }
 
 /// Creates a new instance of [Left] with a value
@@ -217,6 +220,9 @@ class Right<L, R> extends Either<L, R> {
 
   @override
   bool get isRight => true;
+
+  @override
+  String toString() => 'Right($right)';
 }
 
 /// Creates a new instance of [Right] with a value
