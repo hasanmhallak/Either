@@ -1,3 +1,8 @@
+## 2.0.0
+
+- Support better string representation.
+- Migrate to Dart 3.
+
 ## 1.0.4
 
 - Add `isRight` method
