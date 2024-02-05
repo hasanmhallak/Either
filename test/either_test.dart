@@ -156,5 +156,16 @@ void main() {
         expect(either.rightOrNull(), equals('value'));
       });
     });
+    group('toString', () {
+      test('Left.toString should return the right string representation', () {
+        final either = left<int, String>(42);
+        expect(either.toString(), equals('Left(42)'));
+      });
+
+      test('Right.toString should return the right string representation', () {
+        final either = right<int, int>(42);
+        expect(either.toString(), equals('Right(42)'));
+      });
+    });
   });
 }
