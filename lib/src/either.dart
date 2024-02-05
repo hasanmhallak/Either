@@ -1,6 +1,5 @@
-import 'package:meta/meta.dart';
+// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 
-@immutable
 abstract class Either<L, R> {
   const Either._();
 
@@ -111,7 +110,7 @@ abstract class Either<L, R> {
 /// Instances of [Left] are created using the
 /// constructor and take a value of type [L] as
 /// a parameter.
-@immutable
+
 class Left<L, R> extends Either<L, R> {
   /// Creates a new instance of [Left] with a
   /// value of type [L].

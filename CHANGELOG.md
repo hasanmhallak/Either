@@ -1,3 +1,7 @@
+## 2.0.1
+
+- Remove meta dependency
+
 ## 2.0.0
 
 - Support better string representation.

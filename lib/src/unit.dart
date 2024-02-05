@@ -1,4 +1,4 @@
-import 'package:meta/meta.dart';
+// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 
 /// The [Unit] class represents the `void` type in Dart.
 ///
@@ -13,7 +13,6 @@ import 'package:meta/meta.dart';
 /// that represents `void`. This value can be used in
 /// place of `void` when defining functions or classes
 /// that take a parameter of type `void`.
-@immutable
 class Unit {
   /// Creates a new instance of the [Unit] class.
   ///
