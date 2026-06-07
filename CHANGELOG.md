@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Add `map`, `mapLeft`, `bimap`, `flatMap`, `getOrElse`, `orElse` and `ensure` methods.
+
 ## 2.0.1
 
 - Remove meta dependency

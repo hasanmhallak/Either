@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
-
 /// The [Unit] class represents the `void` type in Dart.
 ///
 /// Dart does not have a separate `void` type, but rather

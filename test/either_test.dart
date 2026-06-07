@@ -167,5 +167,121 @@ void main() {
         expect(either.toString(), equals('Right(42)'));
       });
     });
+
+    group('map', () {
+      test('should transform the right value', () {
+        final either = right<String, int>(21);
+        expect(either.map((v) => v * 2), equals(right<String, int>(42)));
+      });
+
+      test('should leave a left value untouched', () {
+        final either = left<String, int>('error');
+        expect(either.map((v) => v * 2), equals(left<String, int>('error')));
+      });
+
+      test('should allow changing the right type', () {
+        final either = right<String, int>(42);
+        final result = either.map((v) => v.toString());
+        expect(result, equals(right<String, String>('42')));
+      });
+    });
+
+    group('mapLeft', () {
+      test('should transform the left value', () {
+        final either = left<String, int>('error');
+        expect(either.mapLeft((e) => e.length), equals(left<int, int>(5)));
+      });
+
+      test('should leave a right value untouched', () {
+        final either = right<String, int>(42);
+        expect(either.mapLeft((e) => e.length), equals(right<int, int>(42)));
+      });
+    });
+
+    group('bimap', () {
+      test('should transform a right value with rightFn', () {
+        final either = right<String, int>(42);
+        final result = either.bimap((e) => e.length, (v) => v * 2);
+        expect(result, equals(right<int, int>(84)));
+      });
+
+      test('should transform a left value with leftFn', () {
+        final either = left<String, int>('error');
+        final result = either.bimap((e) => e.length, (v) => v * 2);
+        expect(result, equals(left<int, int>(5)));
+      });
+    });
+
+    group('flatMap', () {
+      Either<String, int> parse(String value) {
+        final parsed = int.tryParse(value);
+        return parsed == null ? left('invalid') : right(parsed);
+      }
+
+      test('should chain into the returned Either on a right value', () {
+        final either = right<String, String>('42');
+        expect(either.flatMap(parse), equals(right<String, int>(42)));
+      });
+
+      test('should short-circuit when the callback returns a left', () {
+        final either = right<String, String>('x');
+        expect(either.flatMap(parse), equals(left<String, int>('invalid')));
+      });
+
+      test('should leave an existing left untouched', () {
+        final either = left<String, String>('error');
+        expect(either.flatMap(parse), equals(left<String, int>('error')));
+      });
+    });
+
+    group('getOrElse', () {
+      test('should return the right value when present', () {
+        final either = right<String, int>(42);
+        expect(either.getOrElse((e) => -1), equals(42));
+      });
+
+      test('should compute a fallback from the left value', () {
+        final either = left<String, int>('error');
+        expect(either.getOrElse((e) => e.length), equals(5));
+      });
+    });
+
+    group('orElse', () {
+      test('should keep the right value', () {
+        final either = right<String, int>(42);
+        expect(either.orElse((e) => right(0)), equals(right<String, int>(42)));
+      });
+
+      test('should recover a left into a right', () {
+        final either = left<String, int>('error');
+        expect(either.orElse((e) => right(0)), equals(right<String, int>(0)));
+      });
+
+      test('should allow recovering a left into another left', () {
+        final either = left<String, int>('error');
+        final result = either.orElse((e) => left('failed again'));
+        expect(result, equals(left<String, int>('failed again')));
+      });
+    });
+
+    group('ensure', () {
+      test('should keep a right value that satisfies the predicate', () {
+        final either = right<String, int>(42);
+        final result = either.ensure((v) => v > 0, (v) => 'not positive');
+        expect(result, equals(right<String, int>(42)));
+      });
+
+      test('should turn a failing right value into a left', () {
+        final either = right<String, int>(-1);
+        final result = either.ensure((v) => v > 0, (v) => 'not positive');
+        expect(result, equals(left<String, int>('not positive')));
+      });
+
+      test('should leave an existing left untouched', () {
+        final either = left<String, int>('error');
+        final result = either.ensure((v) => v > 0, (v) => 'not positive');
+        expect(result, equals(left<String, int>('error')));
+      });
+    });
   });
 }

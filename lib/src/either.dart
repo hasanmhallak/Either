@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
-
 abstract class Either<L, R> {
   const Either._();
 
@@ -99,6 +97,137 @@ abstract class Either<L, R> {
   ///    either2.rightOrNull(); // returns null
   /// ```
   R? rightOrNull();
+
+  /// Transforms the [Right] value of this [Either] using [fn],
+  /// leaving a [Left] untouched.
+  ///
+  /// This is the right-biased `map`: [fn] runs only when this is a
+  /// [Right]. When this is a [Left], the same error is propagated and
+  /// [fn] is never called.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    right<String, int>(21).map((v) => v * 2); // Right(42)
+  ///    left<String, int>('error').map((v) => v * 2); // Left('error')
+  /// ```
+  Either<L, R2> map<R2>(R2 Function(R right) fn) =>
+      fold((l) => Left<L, R2>(l), (r) => Right<L, R2>(fn(r)));
+
+  /// Transforms the [Left] value of this [Either] using [fn],
+  /// leaving a [Right] untouched.
+  ///
+  /// Useful for converting an error into another error type without
+  /// touching the success value.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    left<String, int>('error').mapLeft((e) => e.length); // Left(5)
+  ///    right<String, int>(42).mapLeft((e) => e.length); // Right(42)
+  /// ```
+  Either<L2, R> mapLeft<L2>(L2 Function(L left) fn) =>
+      fold((l) => Left<L2, R>(fn(l)), (r) => Right<L2, R>(r));
+
+  /// Transforms both sides of this [Either] at once, applying
+  /// [leftFn] to a [Left] value and [rightFn] to a [Right] value.
+  ///
+  /// Only one of the two functions runs, depending on which side this
+  /// [Either] holds.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    right<String, int>(42).bimap((e) => e.length, (v) => v * 2);
+  ///    // Right(84)
+  ///    left<String, int>('error').bimap((e) => e.length, (v) => v * 2);
+  ///    // Left(5)
+  /// ```
+  Either<L2, R2> bimap<L2, R2>(
+    L2 Function(L left) leftFn,
+    R2 Function(R right) rightFn,
+  ) =>
+      fold(
+        (l) => Left<L2, R2>(leftFn(l)),
+        (r) => Right<L2, R2>(rightFn(r)),
+      );
+
+  /// Transforms the [Right] value of this [Either] using [fn] and
+  /// flattens the result, leaving a [Left] untouched.
+  ///
+  /// Unlike [map], [fn] returns an [Either] itself, so the result is
+  /// not nested. Use this to chain operations that can each fail; the
+  /// first [Left] short-circuits the chain.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    Either<String, int> parse(String s) {
+  ///      final value = int.tryParse(s);
+  ///      return value == null ? left('invalid') : right(value);
+  ///    }
+  ///
+  ///    right<String, String>('42').flatMap(parse); // Right(42)
+  ///    right<String, String>('x').flatMap(parse); // Left('invalid')
+  ///    left<String, String>('error').flatMap(parse); // Left('error')
+  /// ```
+  Either<L, R2> flatMap<R2>(Either<L, R2> Function(R right) fn) =>
+      fold((l) => Left<L, R2>(l), (r) => fn(r));
+
+  /// Returns the [Right] value if this is a [Right], otherwise
+  /// computes a fallback from the [Left] value using [orElse].
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    right<String, int>(42).getOrElse((e) => -1); // 42
+  ///    left<String, int>('error').getOrElse((e) => -1); // -1
+  /// ```
+  R getOrElse(R Function(L left) orElse) => fold((l) => orElse(l), (r) => r);
+
+  /// Returns this [Either] if it is a [Right], otherwise computes a
+  /// replacement [Either] from the [Left] value using [fn].
+  ///
+  /// Use this to recover from a failure with another fallible
+  /// operation while staying inside [Either].
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    right<String, int>(42).orElse((e) => right(0)); // Right(42)
+  ///    left<String, int>('error').orElse((e) => right(0)); // Right(0)
+  ///    left<String, int>('error').orElse((e) => left('failed again'));
+  ///    // Left('failed again')
+  /// ```
+  Either<L, R> orElse(Either<L, R> Function(L left) fn) =>
+      fold((l) => fn(l), (r) => Right<L, R>(r));
+
+  /// Returns this [Either] unchanged when it is a [Left], or when it
+  /// is a [Right] whose value satisfies [predicate]. When this is a
+  /// [Right] that fails [predicate], it becomes a [Left] built from
+  /// [orLeft].
+  ///
+  /// Use this to enforce a condition on a success value and turn a
+  /// violation into a typed error.
+  ///
+  /// Example usage:
+  ///
+  /// ```dart
+  ///    right<String, int>(42).ensure((v) => v > 0, (v) => 'not positive');
+  ///    // Right(42)
+  ///    right<String, int>(-1).ensure((v) => v > 0, (v) => 'not positive');
+  ///    // Left('not positive')
+  ///    left<String, int>('error').ensure((v) => v > 0, (v) => 'not positive');
+  ///    // Left('error')
+  /// ```
+  Either<L, R> ensure(
+    bool Function(R right) predicate,
+    L Function(R right) orLeft,
+  ) =>
+      fold(
+        (l) => Left<L, R>(l),
+        (r) => predicate(r) ? Right<L, R>(r) : Left<L, R>(orLeft(r)),
+      );
 }
 
 /// A class that represents the left value in an
@@ -110,7 +239,6 @@ abstract class Either<L, R> {
 /// Instances of [Left] are created using the
 /// constructor and take a value of type [L] as
 /// a parameter.
-
 class Left<L, R> extends Either<L, R> {
   /// Creates a new instance of [Left] with a
   /// value of type [L].

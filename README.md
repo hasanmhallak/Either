@@ -12,7 +12,7 @@ To use Either in your Flutter or Dart project, follow these steps:
 
 ```yaml
 dependencies:
-  either: ^1.0.4
+  either: ^2.1.0
 ```
 
 2. Install the package by running flutter pub get in your terminal.
@@ -56,6 +56,81 @@ You can also use the `leftOrNull` and `rightOrNull` methods to get the value of 
    final either2 = right<int, String>('hello');
    either1.leftOrNull(); // returns 42
    either2.leftOrNull(); // returns null
+```
+
+### Transforming and chaining
+
+`Either` is right-biased: the `Right` side is treated as the success value and the `Left` side as the error. The methods below make it easy to transform and chain results without unwrapping them by hand.
+
+#### `map`
+
+Transforms the `Right` value and leaves a `Left` untouched.
+
+```dart
+right<String, int>(21).map((v) => v * 2); // Right(42)
+left<String, int>('error').map((v) => v * 2); // Left('error')
+```
+
+#### `mapLeft`
+
+Transforms the `Left` value and leaves a `Right` untouched. Handy for converting one error type into another.
+
+```dart
+left<String, int>('error').mapLeft((e) => e.length); // Left(5)
+right<String, int>(42).mapLeft((e) => e.length); // Right(42)
+```
+
+#### `bimap`
+
+Transforms whichever side is present, applying `leftFn` to a `Left` and `rightFn` to a `Right`.
+
+```dart
+right<String, int>(42).bimap((e) => e.length, (v) => v * 2); // Right(84)
+left<String, int>('error').bimap((e) => e.length, (v) => v * 2); // Left(5)
+```
+
+#### `flatMap`
+
+Like `map`, but the callback itself returns an `Either`, so the result is flattened instead of nested. Use it to chain steps that can each fail; the first `Left` short-circuits the chain.
+
+```dart
+Either<String, int> parse(String s) {
+  final value = int.tryParse(s);
+  return value == null ? left('invalid') : right(value);
+}
+
+right<String, String>('42').flatMap(parse); // Right(42)
+right<String, String>('x').flatMap(parse); // Left('invalid')
+left<String, String>('error').flatMap(parse); // Left('error')
+```
+
+#### `getOrElse`
+
+Returns the `Right` value, or computes a fallback from the `Left` value.
+
+```dart
+right<String, int>(42).getOrElse((e) => -1); // 42
+left<String, int>('error').getOrElse((e) => -1); // -1
+```
+
+#### `orElse`
+
+Returns the `Either` unchanged when it is a `Right`, otherwise computes a replacement `Either` from the `Left` value. Use it to recover from a failure while staying inside `Either`.
+
+```dart
+right<String, int>(42).orElse((e) => right(0)); // Right(42)
+left<String, int>('error').orElse((e) => right(0)); // Right(0)
+left<String, int>('error').orElse((e) => left('failed again')); // Left('failed again')
+```
+
+#### `ensure`
+
+Keeps a `Right` value only when it satisfies a predicate, otherwise turns it into a `Left`. A `Left` is always left untouched.
+
+```dart
+right<String, int>(42).ensure((v) => v > 0, (v) => 'not positive'); // Right(42)
+right<String, int>(-1).ensure((v) => v > 0, (v) => 'not positive'); // Left('not positive')
+left<String, int>('error').ensure((v) => v > 0, (v) => 'not positive'); // Left('error')
 ```
 
 ### Unit
